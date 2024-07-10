@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Nyagah01-ops/galgitlery.git'
+                git 'https://github.com/Nyagah01-ops/gallery.git'
             }
         }
 
