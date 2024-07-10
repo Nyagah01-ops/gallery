@@ -1,46 +1,42 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 
 // Define routes
-let index = require('./routes/index');
-let image = require('./routes/image');
+const indexRoute = require('./routes/index');
+const imageRoute = require('./routes/image');
 
-// connecting the database
-let mongodb_url = 'mongodb://localhost:27017/';
-let dbName = 'darkroom';
-mongoose.connect(`${mongodb_url}${dbName}`,{ useNewUrlParser: true , useUnifiedTopology: true }, (err)=>{
-    if (err) console.log(err)
+// Connecting to MongoDB
+const mongodb_url = 'mongodb://localhost:27017/';
+const dbName = 'darkroom';
+mongoose.connect(`${mongodb_url}${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true });
+const db = mongoose.connection;
+
+db.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
+db.once('open', () => {
+  console.log('Connected to MongoDB');
 });
 
-// test if the database has connected successfully
-let db = mongoose.connection;
-db.once('open', ()=>{
-    console.log('Database connected successfully')
-})
-
-// Initializing the app
+// Initializing the Express app
 const app = express();
 
-
-// View Engine
+// View Engine setup (assuming you use ejs)
 app.set('view engine', 'ejs');
 
-// Set up the public folder;
+// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// body parser middleware
-app.use(express.json())
+// Middleware to parse JSON bodies
+app.use(express.json());
 
+// Routes
+app.use('/', indexRoute);
+app.use('/image', imageRoute);
 
-app.use('/', index);
-app.use('/image', image);
-
-
-
- 
+// Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT,() =>{
-    console.log(`Server is listening at http://localhost:${PORT}`)
+app.listen(PORT, () => {
+  console.log(`Server is listening at http://localhost:${PORT}`);
 });

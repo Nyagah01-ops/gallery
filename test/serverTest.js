@@ -1,26 +1,33 @@
-process.env.NODE_ENV = 'test';   
+// serverTest.js
 
-var chai = require('chai');
-var chaiHttp = require('chai-http');
+process.env.NODE_ENV = 'test';
 
-var server = require('../server');
-var should = chai.should();
-var expect = chai.expect;
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const server = require('../server'); // Adjust the path as needed
+
+const should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('Photos', function(){
+describe('Photos', function() {
+  it('should list ALL photos on / GET', function(done) {
+    this.timeout(60000); // Increase timeout if necessary
 
-
-    it('should list ALL photos on / GET', function(done){
-        this.timeout(60000);
-        chai.request(server)
-        .get('/')
-        .end(function(err,res){
-            res.should.have.status(200);
-            res.should.be.html;
-            res.body.should.be.a('object')
-            done();
-        })
-    });
-})
+    chai.request(server)
+      .get('/')
+      .end(function(err, res) {
+        if (err) {
+          console.error(err);
+          done(err);
+        } else {
+          res.should.have.status(200);
+          res.should.be.html;
+          // Assuming your response body is JSON, use res.body to check
+          // For HTML, you may check res.text
+          // res.body.should.be.a('object')
+          done();
+        }
+      });
+  });
+});
