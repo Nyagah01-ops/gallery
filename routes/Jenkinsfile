@@ -29,6 +29,14 @@ pipeline {
             steps {
                 sh 'node server'
             }
+            post {
+                success {
+                    slackSend channel: '#jenkins-notifications', color: 'good', message: "Build successful for ${env.JOB_NAME} (${env.BUILD_NUMBER})"
+                }
+                failure {
+                    slackSend channel: '#jenkins-notifications', color: 'danger', message: "Build failed for ${env.JOB_NAME} (${env.BUILD_NUMBER})"
+                }
+            }
         }
 
         stage('Update Landing Page') {
@@ -47,6 +55,20 @@ pipeline {
                 sh 'git commit -m "Update landing page with MILESTONE 2"'
                 sh 'git push origin main'
             }
+            post {
+                success {
+                    slackSend channel: '#jenkins-notifications', color: 'good', message: "Changes pushed successfully for ${env.JOB_NAME} (${env.BUILD_NUMBER})"
+                }
+                failure {
+                    slackSend channel: '#jenkins-notifications', color: 'danger', message: "Failed to push changes for ${env.JOB_NAME} (${env.BUILD_NUMBER})"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            slackSend channel: '#jenkins-notifications', color: 'warning', message: "Pipeline execution finished for ${env.JOB_NAME} (${env.BUILD_NUMBER})"
         }
     }
 }
